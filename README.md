@@ -6,16 +6,29 @@ the base image, the Forge commit and every wheel pinned. Needs a driver that sup
 
 [forge]: https://github.com/Haoming02/sd-webui-forge-classic/tree/neo
 
-## Run
+## Deploy
 
 ```sh
-./build.sh
-./run.sh --recreate
-./verify.sh --recreate
+docker run --detach \
+    --name sdwui-forge-neo \
+    --init \
+    --gpus all \
+    --restart unless-stopped \
+    --user 99:100 \
+    --publish 7860:7860 \
+    --volume /mnt/user/appdata/sd-webui/models:/home/forge/sd-webui/models \
+    --volume /mnt/user/appdata/sd-webui/extensions:/home/forge/sd-webui/extensions \
+    --volume /mnt/user/appdata/sd-webui/config:/home/forge/sd-webui/config \
+    --volume /mnt/user/appdata/sd-webui/cache:/home/forge/sd-webui/cache \
+    --volume /mnt/user/data/sd-webui/output:/home/forge/sd-webui/output \
+    ghcr.io/wishmatic/sd-webui-docker:latest
 ```
 
-`run.sh` reads `IMAGE`, `CONTAINER`, `PORT` and `APPDATA` from the environment. The container runs
-as 99:100, gets `--gpus all`, and serves on port 7860.
+Create those directories owned by 99:100 first.
+
+Never mount `/home/forge/sd-webui` as a whole: it hides the venv baked into the image. `config`
+holds `config.json`, `ui-config.json`, `styles.csv` and `params.txt`; without it every recreate
+resets the UI and saved prompts.
 
 ## Arguments
 
@@ -24,18 +37,3 @@ as 99:100, gets `--gpus all`, and serves on port 7860.
 ```sh
 --api --listen --skip-install --skip-python-version-check --enable-insecure-extension-access
 ```
-
-Override per container with `-e COMMANDLINE_ARGS=...`. Keep `--skip-install` as that prevents `pip`
-runs at boot.
-
-## Updating
-
-```sh
-./scripts/check-forge-update.sh
-./scripts/compile-deps.sh
-./build.sh
-./verify.sh --recreate
-```
-
-Roll back with `IMAGE=forge-neo:digest-<id> ./run.sh --recreate`. CI pushes `:latest` and
-`:forge-<sha>` to `ghcr.io/<owner>/<repo>` on `main`.
