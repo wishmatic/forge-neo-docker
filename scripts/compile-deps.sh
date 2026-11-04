@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-
-# Regenerates requirements.lock. Run after bumping FORGE_REF or changing requirements.in or
-# extras.txt, then rebuild and verify.
-
+# Regenerates requirements.lock. Run after bumping FORGE_REF or changing
+# requirements.in / extras.txt, then rebuild.
 set -euo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "$0")/.." && pwd)
@@ -18,7 +16,7 @@ if [ -z "$FORGE_REF" ] || [ -z "$TORCH_INDEX" ]; then
 fi
 
 if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
-    echo "$IMAGE is not built yet; run ./build.sh first" >&2
+    echo "$IMAGE is not built yet; run: docker build -t $IMAGE ." >&2
     exit 1
 fi
 
@@ -28,6 +26,7 @@ trap 'rm -rf "$WORK"' EXIT
 git clone --quiet --filter=blob:none --no-checkout https://github.com/Haoming02/sd-webui-forge-classic "$WORK/forge"
 git -C "$WORK/forge" checkout --quiet "$FORGE_REF"
 
+# Resolved inside the image, so wheel tags and hashes are the ones it will install.
 docker run --rm \
     --entrypoint uv \
     --volume "$SCRIPT_DIR:/w" \

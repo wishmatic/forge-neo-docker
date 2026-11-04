@@ -9,10 +9,6 @@ Dockerfile
 .dockerignore
 
 # Host tooling and locks
-build.sh
-run.sh
-verify.sh
 requirements.in
 extras.txt
-scripts/check-forge-update.sh
 scripts/compile-deps.sh
