@@ -1,6 +1,7 @@
 {
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
 	"extends": ["config:recommended"],
+	"forkProcessing": "enabled",
 	"timezone": "UTC",
 	"schedule": ["after 12pm on tuesday"],
 	"minimumReleaseAge": "3 days",
