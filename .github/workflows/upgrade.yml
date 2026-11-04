@@ -1,0 +1,48 @@
+name: Upgrade Forge Neo
+
+on:
+    schedule:
+        # Thursdays 00:00 UTC
+        - cron: "0 0 * * 4"
+    workflow_dispatch:
+
+permissions:
+    contents: write
+
+jobs:
+    upgrade:
+        runs-on: ubuntu-latest
+        env:
+            REPO: Haoming02/sd-webui-forge-classic
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        steps:
+            - uses: actions/checkout@v7
+
+            - name: newest tag
+              id: tag
+              run: |
+                  tag=$(gh api "repos/$REPO/tags?per_page=1" --jq '.[0].name')
+                  sha=$(gh api "repos/$REPO/tags?per_page=1" --jq '.[0].commit.sha')
+                  echo "name=$tag" >> "$GITHUB_OUTPUT"
+                  echo "sha=$sha" >> "$GITHUB_OUTPUT"
+                  echo "newest tag: $tag ($sha)"
+
+            # "ahead" means the tag has commits the pin does not. Anything else, including "behind",
+            # means the pin is already at or past that tag.
+
+            - name: compare with the pin
+              id: check
+              run: |
+                  ref=$(sed -n 's/^ARG FORGE_REF=\([0-9a-f]\{40\}\)$/\1/p' Dockerfile)
+                  status=$(gh api "repos/$REPO/compare/$ref...${{ steps.tag.outputs.name }}" --jq .status)
+                  echo "status=$status"
+                  echo "status=$status" >> "$GITHUB_OUTPUT"
+
+            - name: bump
+              if: steps.check.outputs.status == 'ahead'
+              run: |
+                  sed -i "s/^ARG FORGE_REF=.*/ARG FORGE_REF=${{ steps.tag.outputs.sha }}/" Dockerfile
+                  git config user.name "github-actions[bot]"
+                  git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                  git commit -am "update to ${{ steps.tag.outputs.name }}"
+                  git push
