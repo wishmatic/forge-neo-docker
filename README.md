@@ -146,7 +146,7 @@ automerge). The venv moves only by recompiling the lock:
 **Rollback.** Images are tagged `forge-<commit>` and `digest-<image id>`, so rolling back is
 `IMAGE=forge-neo:digest-<id> ./run.sh --recreate`. `IMAGE` also works with `verify.sh`.
 
-**Registry copy.** CI builds and pushes to `ghcr.io/<owner>/<repo>` on `master`, as `:latest`
+**Registry copy.** CI builds and pushes to `ghcr.io/<owner>/<repo>` on `main`, as `:latest`
 and `:forge-<sha>`. Nothing is pushed to Docker Hub.
 
 ## Things that look wrong but are not

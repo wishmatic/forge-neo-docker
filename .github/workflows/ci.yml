@@ -2,7 +2,7 @@ name: Forge Neo image
 
 on:
     push:
-        branches: [master]
+        branches: [main]
 
 jobs:
     publish:
