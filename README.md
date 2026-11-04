@@ -4,8 +4,6 @@ Forge Neo ([`sd-webui-forge-classic`, `neo` branch][forge]) in an image built ag
 the base image, the Forge commit and every wheel pinned. Needs a driver that supports CUDA 13;
 `sm_120` (RTX 50xx) included.
 
-[forge]: https://github.com/Haoming02/sd-webui-forge-classic/tree/neo
-
 ## Deploy
 
 ```sh
@@ -21,7 +19,7 @@ docker run --detach \
     --volume /mnt/user/appdata/sd-webui/config:/home/forge/sd-webui/config \
     --volume /mnt/user/appdata/sd-webui/cache:/home/forge/sd-webui/cache \
     --volume /mnt/user/data/sd-webui/output:/home/forge/sd-webui/output \
-    ghcr.io/wishmatic/sd-webui-docker:latest
+    ghcr.io/wishmatic/forge-neo-docker:latest
 ```
 
 Create those directories owned by 99:100 first.
@@ -37,3 +35,5 @@ resets the UI and saved prompts.
 ```sh
 --api --listen --skip-install --skip-python-version-check --enable-insecure-extension-access
 ```
+
+[forge]: https://github.com/Haoming02/sd-webui-forge-classic/tree/neo
