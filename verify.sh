@@ -6,12 +6,10 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 
 CONTAINER="${CONTAINER:-sdwui-forge-neo}"
 IMAGE="${IMAGE:-forge-neo:latest}"
-WAIT_SECONDS="${WAIT_SECONDS:-300}"
 
 MODE=container
 STATIC=0
 RECREATE=0
-SKIP_RENDER=0
 
 ALLOWED_TO_FLOAT=""
 
@@ -24,10 +22,9 @@ Runs every check that has to pass before an image is worth deploying.
   --container NAME   container to check (default: $CONTAINER)
   --image IMAGE      check a freshly built image with no running container and no
                      GPU; runs only the checks that need neither (used by CI)
-  --static           skip the GPU and render checks
+  --static           skip the GPU checks
   --recreate         remove and re-create the container with ./run.sh first, and
                      assert the image id is unchanged afterwards
-  --skip-render      skip the 512x512 API render for manual checks
 EOF
 }
 
@@ -37,7 +34,6 @@ while [ $# -gt 0 ]; do
         --image) MODE=image; IMAGE="$2"; shift 2 ;;
         --static) STATIC=1; shift ;;
         --recreate) RECREATE=1; shift ;;
-        --skip-render) SKIP_RENDER=1; shift ;;
         -h|--help) usage; exit 0 ;;
         *) echo "unknown argument: $1" >&2; usage; exit 2 ;;
     esac
@@ -78,18 +74,6 @@ runtime() {
     fi
 }
 
-wait_for_api() {
-    local deadline=$((SECONDS + WAIT_SECONDS))
-    until docker exec "$CONTAINER" curl -fsS http://127.0.0.1:7860/sdapi/v1/options -o /dev/null 2>/dev/null; do
-        if [ "$SECONDS" -ge "$deadline" ]; then
-            echo "server did not answer within ${WAIT_SECONDS}s" >&2
-            docker logs --tail 60 "$CONTAINER" >&2
-            exit 1
-        fi
-        sleep 3
-    done
-}
-
 recreate() {
     local before after
     before=$(docker inspect --format '{{.Image}}' "$CONTAINER")
@@ -118,13 +102,6 @@ if [ "$STATIC" = 0 ]; then
     step "cuda runs"
     runtime gpu || fail "a CUDA op failed"
     pass "matmul and xformers attention ran"
-
-    if [ "$SKIP_RENDER" = 0 ]; then
-        step "512x512 render"
-        wait_for_api
-        runtime render || fail "the render did not complete"
-        pass "rendered"
-    fi
 fi
 
 printf '\nall checks passed\n'

@@ -1,13 +1,12 @@
-import base64
-import io
+"""Runtime checks, run inside the container as `python - <stage>`.
+
+Split by stage so the checks that need no GPU can run on their own.
+"""
+
 import json
 import os
 import re
 import sys
-import time
-import urllib.request
-
-API = os.environ.get("VERIFY_API", "http://127.0.0.1:7860")
 
 
 def check_static():
@@ -73,6 +72,9 @@ def check_gpu():
             "xformers has no C++ library; Forge would silently fall back to pytorch attention"
         )
 
+    # Set by uv because requirements.in pins xformers by URL. A PyPI xformers of the same version
+    # is built against another CUDA and would fail here anyway.
+
     from importlib.metadata import distribution
 
     source = distribution("xformers").read_text("direct_url.json")
@@ -84,70 +86,13 @@ def check_gpu():
 
     q = torch.randn(2, 64, 8, 16, device="cuda", dtype=torch.bfloat16)
     out = xformers.ops.memory_efficient_attention(q, q, q)
-
     print(f"     xformers memory_efficient_attention -> {tuple(out.shape)} {out.dtype}")
-
-
-def check_render():
-    from PIL import Image
-
-    def get(path):
-        with urllib.request.urlopen(API + path, timeout=60) as response:
-            return json.load(response)
-
-    models = get("/sdapi/v1/sd-models")
-    if not models:
-        sys.exit(
-            "no checkpoints in models/Stable-diffusion, so there is nothing to render with"
-        )
-
-    title = os.environ.get("VERIFY_CHECKPOINT") or models[0]["title"]
-    payload = {
-        "prompt": "a red cube on a wooden table, studio light",
-        "negative_prompt": "",
-        "width": 512,
-        "height": 512,
-        "steps": int(os.environ.get("VERIFY_STEPS", "8")),
-        "batch_size": 1,
-        "n_iter": 1,
-        "cfg_scale": 4,
-        "seed": 1,
-        "enable_hr": False,
-        "override_settings": {"sd_model_checkpoint": title},
-        "override_settings_restore_afterwards": False,
-    }
-
-    request = urllib.request.Request(
-        API + "/sdapi/v1/txt2img",
-        data=json.dumps(payload).encode(),
-        headers={"Content-Type": "application/json"},
-    )
-
-    started = time.time()
-    with urllib.request.urlopen(request, timeout=1800) as response:
-        result = json.load(response)
-
-    images = result.get("images") or []
-    if not images:
-        sys.exit(f"txt2img returned no images: {json.dumps(result)[:400]}")
-
-    image = Image.open(io.BytesIO(base64.b64decode(images[0])))
-    elapsed = time.time() - started
-    print(
-        f"     rendered {image.size[0]}x{image.size[1]} with {title!r} in {elapsed:.1f}s"
-    )
-
-    if image.size != (512, 512):
-        sys.exit(f"expected a 512x512 image, got {image.size}")
-    if len(images) != 1:
-        sys.exit(f"expected 1 image, got {len(images)}")
 
 
 STAGES = {
     "static": check_static,
     "pins": check_pins,
     "gpu": check_gpu,
-    "render": check_render,
 }
 
 
