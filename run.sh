@@ -5,7 +5,12 @@ set -euo pipefail
 IMAGE="${IMAGE:-forge-neo:latest}"
 CONTAINER="${CONTAINER:-sdwui-forge-neo}"
 PORT="${PORT:-7860}"
-APPDATA="${APPDATA:-/mnt/user/appdata/forge-neo}"
+APPDATA="${APPDATA:-}"
+
+if [ -z "$APPDATA" ]; then
+    echo "APPDATA is not set!" >&2
+    exit 1
+fi
 
 RECREATE=0
 if [ "${1:-}" = "--recreate" ]; then
