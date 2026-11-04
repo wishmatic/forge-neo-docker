@@ -1,6 +1,18 @@
-data/
-__pycache__/
-*.pyc
-*.pyo
-.DS_Store
-*.log
+# SCM
+.git
+.github
+.gitignore
+
+# Not build inputs
+*.md
+Dockerfile
+.dockerignore
+
+# Host tooling and locks
+build.sh
+run.sh
+verify.sh
+requirements.in
+extras.txt
+scripts/check-forge-update.sh
+scripts/compile-deps.sh

@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Runtime data, if the image is ever run without bind mounts
+models/
+output/
+extensions/
+config/
+cache/
+data/
+
+# Env / logs / editor
+.env
+.env.*
+*.log
+*.swp
+*~
+.DS_Store

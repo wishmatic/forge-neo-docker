@@ -1,0 +1,19 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": ["config:recommended"],
+	"timezone": "UTC",
+	"schedule": ["after 12pm on tuesday"],
+	"minimumReleaseAge": "3 days",
+	"lockFileMaintenance": {
+		"enabled": false
+	},
+	"enabledManagers": ["dockerfile", "github-actions"],
+	"packageRules": [
+		{
+			"matchDatasources": ["docker"],
+			"groupName": "base image",
+			"pinDigests": true,
+			"automerge": false
+		}
+	]
+}

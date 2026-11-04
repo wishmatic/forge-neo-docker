@@ -1,0 +1,26 @@
+name: Forge Neo image
+
+on:
+    push:
+        branches: [master]
+
+jobs:
+    publish:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            packages: write
+        steps:
+            - uses: actions/checkout@v7
+            - uses: docker/login-action@v4
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+            - name: build and push image
+              run: |
+                  image="ghcr.io/${{ github.repository }}"
+                  forge_ref=$(sed -n 's/^ARG FORGE_REF=\([0-9a-f]\{40\}\)$/\1/p' Dockerfile)
+                  docker build --tag "$image:latest" --tag "$image:forge-${forge_ref:0:12}" .
+                  docker push "$image:latest"
+                  docker push "$image:forge-${forge_ref:0:12}"
