@@ -546,6 +546,7 @@ huggingface-hub==0.36.2 \
     #   accelerate
     #   diffusers
     #   gradio-client
+    #   timm
     #   tokenizers
     #   transformers
 idna==3.20 \
@@ -1753,6 +1754,7 @@ pyyaml==6.0.3 \
     #   accelerate
     #   huggingface-hub
     #   omegaconf
+    #   timm
     #   transformers
 regex==2026.9.29 \
     --hash=sha256:01000ddf0e3ffef97f2413ceb514f6313040106b6d18a03ee00a4fe35c1eb1db \
@@ -1944,6 +1946,7 @@ safetensors==0.8.0 \
     #   accelerate
     #   diffusers
     #   spandrel
+    #   timm
     #   transformers
 scikit-image==0.25.2 \
     --hash=sha256:24cc986e1f4187a12aa319f777b36008764e856e5013666a4a83f8df083c2641 \
@@ -2076,6 +2079,10 @@ tifffile==2026.10.15 \
     --hash=sha256:3dcf6c56731a45c1f85c81e90dad922b0a380a2d639e77f71207e010f8ef0f7b \
     --hash=sha256:a5ee666dbd6d62e059830a3450825a2521a981b3f45c07a80ab009484aef56f0
     # via scikit-image
+timm==1.0.31 \
+    --hash=sha256:5bd50f7d0fe6d09bf9285ac2523234a1b7e6bf075c0be3e7aed09139fcb617c7 \
+    --hash=sha256:baa0b333339c46d3d6d4965d99b69f5053afed71210e8f433d7ea5ee6a18f0ec
+    # via -r extras.txt
 tokenizers==0.22.2 \
     --hash=sha256:143b999bdc46d10febb15cbffb4207ddd1f410e2c755857b5a0797961bbdc113 \
     --hash=sha256:1a62ba2c5faa2dd175aaeed7b15abf18d20266189fb3406c5d0550dd34dd5f37 \
@@ -2139,6 +2146,7 @@ torch==2.14.1+cu130 \
     #   kornia
     #   spandrel
     #   spandrel-extra-arches
+    #   timm
     #   torchsde
     #   torchvision
     #   xformers
@@ -2176,6 +2184,7 @@ torchvision==0.29.1+cu130 \
     #   facexlib
     #   spandrel
     #   spandrel-extra-arches
+    #   timm
 tqdm==4.70.1 \
     --hash=sha256:c293e525e6fef9c20e8728fd4612df02a0aa31bb5fe91ecd93e123b1b7bffa73 \
     --hash=sha256:cefd0eca11b2a37a3aee776544d4f4ae913f02688135b5556b8788dfa474afc4
