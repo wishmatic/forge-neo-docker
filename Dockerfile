@@ -5,7 +5,7 @@ FROM nvidia/cuda:13.0.2-cudnn-runtime-ubuntu24.04@sha256:14d94b039cb94bbd5da559f
 ARG TORCH_INDEX=cu130
 
 ARG FORGE_REPO=https://github.com/Haoming02/sd-webui-forge-classic
-ARG FORGE_REF=286a244ec2056882471b09a3a4ea6c2cd1c450f6
+ARG FORGE_REF=2c25fd9c92882791eaea190983303198ce743286
 
 ARG UID=99
 ARG GID=100
